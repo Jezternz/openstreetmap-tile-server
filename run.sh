@@ -16,7 +16,7 @@ if [ "$#" -ne 1 ]; then
     echo "usage: <import|run>"
     echo "commands:"
     echo "    import: Set up the database and import /data.osm.pbf"
-    echo "    run: Runs Apache and renderd to serve tiles at /tile/{z}/{x}/{y}.png"
+    echo "    run: Runs Apache and renderd to serve tiles at /osm/{z}/{x}/{y}.png"
     echo "environment variables:"
     echo "    THREADS: defines number of threads used for importing / tile rendering"
     echo "    UPDATES: consecutive updates (enabled/disabled)"

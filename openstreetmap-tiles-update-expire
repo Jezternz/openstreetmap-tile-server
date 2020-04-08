@@ -186,8 +186,14 @@ fi
 # delete >= $EXPIRY_DELETEFROM and <= $EXPIRY_MAXZOOM.
 # The default path to renderd.sock is fixed.
 #------------------------------------------------------------------------------
-    if ! render_expired --map=ajt --min-zoom=$EXPIRY_MINZOOM --touch-from=$EXPIRY_TOUCHFROM --delete-from=$EXPIRY_DELETEFROM --max-zoom=$EXPIRY_MAXZOOM -s /var/run/renderd/renderd.sock < "$EXPIRY_FILE.$$" 2>&1 | tail -8 >> "$EXPIRYLOG"; then
-        m_info "Expiry failed"
+    if ! render_expired --map=osm --min-zoom=$EXPIRY_MINZOOM --touch-from=$EXPIRY_TOUCHFROM --delete-from=$EXPIRY_DELETEFROM --max-zoom=$EXPIRY_MAXZOOM -s /var/run/renderd/renderd.sock < "$EXPIRY_FILE.$$" 2>&1 | tail -8 >> "$EXPIRYLOG"; then
+        m_info "osm Expiry failed"
+    fi
+
+    ## Add expiry for any additional styles:
+    
+    if ! render_expired --map=vizall_light --min-zoom=$EXPIRY_MINZOOM --touch-from=$EXPIRY_TOUCHFROM --delete-from=$EXPIRY_DELETEFROM --max-zoom=$EXPIRY_MAXZOOM -s /var/run/renderd/renderd.sock < "$EXPIRY_FILE.$$" 2>&1 | tail -8 >> "$EXPIRYLOG"; then
+        m_info "vizall_light Expiry failed"
     fi
 
     rm "$EXPIRY_FILE.$$"

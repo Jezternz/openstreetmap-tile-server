@@ -135,7 +135,7 @@ RUN mkdir -p /home/renderer/src \
   && rm /home/renderer/src/openstreetmap-carto/data/*.zip \
   && cd /home/renderer/src \
   && git clone https://github.com/Jezternz/openstreetmap-carto-vizall-light.git \
-  && git -C openstreetmap-carto-vizall-light checkout vizall.light.0.3 \
+  && git -C openstreetmap-carto-vizall-light checkout vizall.light.0.4 \
   && cd openstreetmap-carto-vizall-light \
   && rm -rf .git \
   && carto project.mml > mapnik.xml \

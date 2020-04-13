@@ -47,6 +47,27 @@
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
             id: 'base'
         }).addTo(map);
+
+
+        const positionTracker = (() =>
+        {
+            L.Control.MyControl = L.Control.extend({
+                onAdd: function(map) {
+                    var el = L.DomUtil.create('div', 'leaflet-bar my-control');
+                    let pos = { zoom: map.getZoom(), lat: 0, lng: 0 };
+                    let render = () => el.innerHTML = `zoom: ${pos.zoom}<br>lat: ${pos.lat}<br>lng: ${pos.lng}`;
+                    map.on('mousemove', e => { pos = { ...pos, ...e.latlng }; render(); });
+                    map.on('zoomend', e => { pos = { ...pos, zoom: map.getZoom() }; render(); });
+                    render();
+                    el.style.padding = "5px 10px";
+                    el.style.background = "#fff";
+                    return el;
+                }, 
+                onRemove: function(map) {}
+            });
+            L.control.myControl = (opts) => new L.Control.MyControl(opts);
+            L.control.myControl({ position: 'bottomleft' }).addTo(map);
+        })();
     </script>
 </body>
 

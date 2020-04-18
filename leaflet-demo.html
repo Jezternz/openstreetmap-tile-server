@@ -23,6 +23,15 @@
             margin: 0;
             padding: 0;
         }
+
+        .control-style-chooser h2 {
+            margin-top: 0 !important;
+        }
+
+        .control-style-chooser a {
+            width: auto !important;
+            padding: 5px 10px !important;
+        }
     </style>
 </head>
 
@@ -30,44 +39,68 @@
     <div id="map"></div>
 
     <script>
-        var map = L.map('map').setView([0, 0], 3);
 
-        var args = window.location.search
+        const styleOptions = ["osm", "vizall_light"];
+
+        const args = window.location.search
             .slice(1)
             .split('&')
             .reduce(function (prev, cur) { var kvp = cur.split("="); prev[kvp[0]] = kvp[1]; return prev; }, {});
 
         if (!args.style) {
-            var newLocation = document.location.href + (document.location.href.indexOf('?') === -1 ? '?' : '') + "style=osm";
+            var newLocation = document.location.href + (document.location.href.indexOf('?') === -1 ? '?' : '') + `style=${styleOptions[0]}`;
             window.location.replace(newLocation);
         }
 
-        L.tileLayer('/' + args.style + '/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-            id: 'base'
-        }).addTo(map);
 
+        renderMap: {
+            const vMap = L.map('map').setView([0, 0], 3);
 
-        const positionTracker = (() =>
-        {
-            L.Control.MyControl = L.Control.extend({
-                onAdd: function(map) {
-                    var el = L.DomUtil.create('div', 'leaflet-bar my-control');
-                    let pos = { zoom: map.getZoom(), lat: 0, lng: 0 };
-                    let render = () => el.innerHTML = `zoom: ${pos.zoom}<br>lat: ${pos.lat}<br>lng: ${pos.lng}`;
-                    map.on('mousemove', e => { pos = { ...pos, ...e.latlng }; render(); });
-                    map.on('zoomend', e => { pos = { ...pos, zoom: map.getZoom() }; render(); });
-                    render();
-                    el.style.padding = "5px 10px";
-                    el.style.background = "#fff";
-                    return el;
-                }, 
-                onRemove: function(map) {}
-            });
-            L.control.myControl = (opts) => new L.Control.MyControl(opts);
-            L.control.myControl({ position: 'bottomleft' }).addTo(map);
-        })();
+            L.tileLayer('/' + args.style + '/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+                id: 'base'
+            }).addTo(vMap);
+
+            styleChooser: {
+                L.Control.StyleChooserControl = L.Control.extend({
+                    onAdd: function (map) {
+                        var el = L.DomUtil.create('div', 'leaflet-bar control-style-chooser');
+                        el.innerHTML = `<h2>Styles</h2>`;
+                        el.innerHTML += styleOptions
+                            .map(s =>
+                                `<div><a href="${document.location.href.slice(0, document.location.href.indexOf('?'))}?style=${s}">${s}</a></div>`
+                            ).join('');
+                        el.style.padding = "5px 10px";
+                        el.style.background = "#fff";
+                        return el;
+                    },
+                    onRemove: function (map) { }
+                });
+                const positionTracker = new L.Control.StyleChooserControl({ position: 'topright' });
+                positionTracker.addTo(vMap);
+            }
+
+            positionTracker: {
+                L.Control.ViewPositionTrackerControl = L.Control.extend({
+                    onAdd: function (map) {
+                        var el = L.DomUtil.create('div', 'leaflet-bar control-view-position');
+                        let pos = { zoom: map.getZoom(), lat: 0, lng: 0 };
+                        let render = () => el.innerHTML = `zoom: ${pos.zoom}<br>lat: ${pos.lat}<br>lng: ${pos.lng}`;
+                        map.on('mousemove', e => { pos = { ...pos, ...e.latlng }; render(); });
+                        map.on('zoomend', e => { pos = { ...pos, zoom: map.getZoom() }; render(); });
+                        render();
+                        el.style.padding = "5px 10px";
+                        el.style.background = "#fff";
+                        return el;
+                    },
+                    onRemove: function (map) { }
+                });
+                const positionTracker = new L.Control.ViewPositionTrackerControl({ position: 'bottomleft' });
+                positionTracker.addTo(vMap);
+            };
+        }
+
     </script>
 </body>
 
